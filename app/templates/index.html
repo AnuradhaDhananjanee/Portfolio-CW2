@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ShipIQ — E-Commerce Delivery Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --card: #151d2e;
+  --border: #1e2d45;
+  --accent: #3b82f6;
+  --accent2: #06b6d4;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
+
+/* ── Background ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 20% 20%,rgba(59,130,246,.08) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 40% at 80% 80%,rgba(6,182,212,.06) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── Nav ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,14,26,.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 2rem;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{font-family:var(--font-display);font-size:1.4rem;font-weight:800;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-links{display:flex;gap:2rem;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:500;
+  transition:color .2s;cursor:pointer;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;padding:.25rem .75rem;border-radius:999px;font-size:.75rem;font-weight:600;}
+
+/* ── Layout ── */
+.container{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:1;}
+.page{display:none;animation:fadeIn .3s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Hero ── */
+.hero{text-align:center;padding:4rem 0 3rem;}
+.hero-tag{display:inline-block;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);
+  color:var(--accent);padding:.4rem 1.2rem;border-radius:999px;font-size:.8rem;
+  font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem;}
+.hero h1{font-family:var(--font-display);font-size:clamp(2.5rem,5vw,4rem);font-weight:800;
+  line-height:1.1;margin-bottom:1rem;}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero p{color:var(--muted);font-size:1.1rem;max-width:600px;margin:0 auto 2rem;line-height:1.7;}
+
+/* ── Stat Cards ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem;margin-bottom:2.5rem;}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:1.5rem;position:relative;overflow:hidden;
+  transition:transform .2s,border-color .2s;
+}
+.stat-card:hover{transform:translateY(-2px);border-color:var(--accent);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.stat-label{color:var(--muted);font-size:.8rem;font-weight:500;text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:.5rem;}
+.stat-value{font-family:var(--font-display);font-size:2.2rem;font-weight:800;line-height:1;}
+.stat-sub{color:var(--muted);font-size:.85rem;margin-top:.4rem;}
+.stat-card.danger .stat-value{color:var(--danger);}
+.stat-card.success .stat-value{color:var(--success);}
+.stat-card.accent .stat-value{color:var(--accent);}
+.stat-card.warning .stat-value{color:var(--warning);}
+
+/* ── Section Titles ── */
+.section-title{font-family:var(--font-display);font-size:1.4rem;font-weight:700;
+  margin-bottom:1.25rem;display:flex;align-items:center;gap:.75rem;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── Charts Row ── */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2rem;}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;}
+.chart-title{font-size:.9rem;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:1.25rem;}
+
+/* ── Bar Charts ── */
+.bar-group{display:flex;flex-direction:column;gap:.75rem;}
+.bar-item{display:flex;flex-direction:column;gap:.3rem;}
+.bar-label{font-size:.85rem;font-weight:500;display:flex;justify-content:space-between;}
+.bar-label span{color:var(--muted);font-size:.8rem;}
+.bar-track{background:rgba(255,255,255,.05);border-radius:999px;height:8px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:999px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+.bar-fill.danger{background:linear-gradient(90deg,var(--danger),#f87171);}
+.bar-fill.success{background:linear-gradient(90deg,var(--success),#34d399);}
+.bar-fill.accent{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.bar-fill.warning{background:linear-gradient(90deg,var(--warning),#fbbf24);}
+
+/* ── Donut ── */
+.donut-wrap{display:flex;align-items:center;gap:2rem;}
+.donut-svg{flex-shrink:0;}
+.donut-legend{display:flex;flex-direction:column;gap:.75rem;}
+.legend-item{display:flex;align-items:center;gap:.6rem;font-size:.9rem;}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+/* ── Insight Cards ── */
+.insights-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;margin-bottom:2rem;}
+.insight-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;}
+.insight-icon{font-size:1.8rem;margin-bottom:.75rem;}
+.insight-title{font-weight:600;font-size:1rem;margin-bottom:.5rem;}
+.insight-text{color:var(--muted);font-size:.875rem;line-height:1.6;}
+.insight-highlight{color:var(--accent);font-weight:600;}
+
+/* ── Predict Page ── */
+.predict-layout{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;}
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;}
+.form-title{font-family:var(--font-display);font-size:1.4rem;font-weight:700;margin-bottom:.5rem;}
+.form-sub{color:var(--muted);font-size:.875rem;margin-bottom:1.75rem;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-group{display:flex;flex-direction:column;gap:.4rem;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+input,select{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:10px;padding:.7rem 1rem;color:var(--text);
+  font-family:var(--font-body);font-size:.9rem;
+  transition:border-color .2s,background .2s;width:100%;
+}
+input:focus,select:focus{outline:none;border-color:var(--accent);background:rgba(59,130,246,.05);}
+select option{background:var(--surface);}
+.predict-btn{
+  width:100%;margin-top:1.5rem;padding:1rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:12px;color:#fff;
+  font-family:var(--font-display);font-size:1rem;font-weight:700;
+  cursor:pointer;transition:opacity .2s,transform .2s;letter-spacing:.02em;
+}
+.predict-btn:hover{opacity:.9;transform:translateY(-1px);}
+.predict-btn:active{transform:translateY(0);}
+
+/* ── Result Card ── */
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;
+  position:sticky;top:80px;}
+.result-empty{text-align:center;padding:3rem 1rem;}
+.result-empty-icon{font-size:3rem;margin-bottom:1rem;opacity:.4;}
+.result-empty-text{color:var(--muted);font-size:.9rem;}
+.result-header{text-align:center;margin-bottom:1.5rem;}
+.result-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.6rem 1.5rem;border-radius:999px;
+  font-family:var(--font-display);font-size:1.1rem;font-weight:800;
+  margin-bottom:1rem;
+}
+.result-badge.late{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.3);}
+.result-badge.ontime{background:rgba(16,185,129,.15);color:var(--success);border:1px solid rgba(16,185,129,.3);}
+.result-confidence{color:var(--muted);font-size:.875rem;}
+.result-confidence strong{color:var(--text);}
+
+/* ── Prob Bar ── */
+.prob-section{margin:1.5rem 0;}
+.prob-label{font-size:.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:.75rem;}
+.prob-bars{display:flex;flex-direction:column;gap:.6rem;}
+.prob-item{display:flex;align-items:center;gap:.75rem;}
+.prob-item-label{font-size:.85rem;width:80px;flex-shrink:0;}
+.prob-track{flex:1;background:rgba(255,255,255,.05);border-radius:999px;height:10px;overflow:hidden;}
+.prob-fill{height:100%;border-radius:999px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+.prob-pct{font-size:.85rem;font-weight:600;width:45px;text-align:right;flex-shrink:0;}
+
+/* ── Risk Factors ── */
+.risk-section{margin-top:1.5rem;}
+.risk-title{font-size:.8rem;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;}
+.risk-list{display:flex;flex-direction:column;gap:.5rem;}
+.risk-item{
+  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);
+  border-radius:8px;padding:.6rem .875rem;
+  font-size:.825rem;color:#fca5a5;
+  display:flex;align-items:flex-start;gap:.5rem;
+}
+.risk-item::before{content:'⚠';flex-shrink:0;}
+.no-risk{
+  background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);
+  border-radius:8px;padding:.6rem .875rem;font-size:.825rem;color:#6ee7b7;
+  display:flex;align-items:center;gap:.5rem;
+}
+.no-risk::before{content:'✓';}
+
+/* ── About Page ── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+.about-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.75rem;}
+.about-card h3{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:.75rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.about-card p{color:var(--muted);font-size:.875rem;line-height:1.7;}
+.tech-list{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;}
+.tech-tag{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);
+  color:var(--accent);padding:.3rem .75rem;border-radius:999px;font-size:.78rem;font-weight:500;}
+
+/* ── Loading ── */
+.loading{display:none;text-align:center;padding:2rem;}
+.spinner{width:40px;height:40px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .7s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:900px){
+  .charts-row,.predict-layout,.about-grid{grid-template-columns:1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .predict-layout .result-card{position:static;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ShipIQ</div>
+  <div class="nav-links">
+    <a class="active" onclick="showPage('dashboard',this)">Dashboard</a>
+    <a onclick="showPage('predict',this)">Predict</a>
+    <a onclick="showPage('about',this)">About</a>
+  </div>
+  <span class="nav-badge">E-Commerce Analytics</span>
+</nav>
+
+<!-- ══════════════ DASHBOARD PAGE ══════════════ -->
+<div id="page-dashboard" class="page active">
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-tag">Portfolio CW2 — Option 2</div>
+    <h1>E-Commerce Delivery<br/><span>Intelligence Dashboard</span></h1>
+    <p>Real-time insights into shipping performance, delay patterns, and predictive analytics for smarter logistics decisions.</p>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="stats-grid" id="stat-cards">
+    <div class="stat-card accent">
+      <div class="stat-label">Total Orders</div>
+      <div class="stat-value" id="s-total">—</div>
+      <div class="stat-sub">Analysed in dataset</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-label">Late Deliveries</div>
+      <div class="stat-value" id="s-late">—</div>
+      <div class="stat-sub" id="s-late-pct">Loading...</div>
+    </div>
+    <div class="stat-card success">
+      <div class="stat-label">On Time</div>
+      <div class="stat-value" id="s-ontime">—</div>
+      <div class="stat-sub" id="s-ontime-pct">Loading...</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="stat-label">Avg Discount (Late)</div>
+      <div class="stat-value" id="s-discount">—</div>
+      <div class="stat-sub">vs on-time orders</div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1 -->
+  <div class="section-title">Delivery Analysis</div>
+  <div class="charts-row">
+
+    <!-- Donut -->
+    <div class="chart-card">
+      <div class="chart-title">Overall Delivery Status</div>
+      <div class="donut-wrap">
+        <svg class="donut-svg" width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="52" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="20"/>
+          <circle id="donut-late" cx="70" cy="70" r="52" fill="none"
+            stroke="#ef4444" stroke-width="20" stroke-linecap="round"
+            stroke-dasharray="0 326" stroke-dashoffset="81.5"
+            transform="rotate(-90 70 70)" style="transition:stroke-dasharray 1.2s ease"/>
+          <circle id="donut-ontime" cx="70" cy="70" r="52" fill="none"
+            stroke="#10b981" stroke-width="20" stroke-linecap="round"
+            stroke-dasharray="0 326" stroke-dashoffset="0"
+            transform="rotate(-90 70 70)" style="transition:stroke-dasharray 1.2s ease;transition-delay:.2s"/>
+          <text x="70" y="65" text-anchor="middle" fill="#e2e8f0"
+            font-family="Syne,sans-serif" font-size="18" font-weight="800" id="donut-pct">—</text>
+          <text x="70" y="83" text-anchor="middle" fill="#64748b" font-size="11">Late</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#ef4444"></div>
+            <span>Late Delivery <strong id="leg-late">—</strong></span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#10b981"></div>
+            <span>On Time <strong id="leg-ontime">—</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- By Shipment Mode -->
+    <div class="chart-card">
+      <div class="chart-title">Late Rate by Shipment Mode</div>
+      <div class="bar-group" id="mode-bars">
+        <div style="color:var(--muted);font-size:.875rem">Loading...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Charts Row 2 -->
+  <div class="charts-row">
+
+    <!-- By Warehouse -->
+    <div class="chart-card">
+      <div class="chart-title">Late Rate by Warehouse Block</div>
+      <div class="bar-group" id="wh-bars">
+        <div style="color:var(--muted);font-size:.875rem">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Discount vs Weight -->
+    <div class="chart-card">
+      <div class="chart-title">Key Factor Comparison</div>
+      <div class="bar-group" id="factor-bars"></div>
+    </div>
+
+  </div>
+
+  <!-- Insights -->
+  <div class="section-title">Key Business Insights</div>
+  <div class="insights-grid">
+    <div class="insight-card">
+      <div class="insight-icon">💸</div>
+      <div class="insight-title">Discount Impact</div>
+      <div class="insight-text">Orders with discounts <span class="insight-highlight">above 10%</span> show significantly higher late delivery rates. High discounts may indicate lower priority handling in the warehouse.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon">📦</div>
+      <div class="insight-title">Weight Factor</div>
+      <div class="insight-text">Packages exceeding <span class="insight-highlight">4,000 grams</span> are more likely to face delays. Heavy shipments require special handling that increases processing time.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon">📞</div>
+      <div class="insight-title">Customer Care Calls</div>
+      <div class="insight-text">Late deliveries generate <span class="insight-highlight">significantly more</span> customer care calls, increasing operational costs and reducing customer satisfaction scores.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon">🏭</div>
+      <div class="insight-title">Warehouse Operations</div>
+      <div class="insight-text">Certain warehouse blocks show <span class="insight-highlight">higher delay rates</span>. Targeted operational improvements in these blocks could significantly reduce overall late deliveries.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════ PREDICT PAGE ══════════════ -->
+<div id="page-predict" class="page">
+<div class="container">
+
+  <div class="hero" style="padding:2.5rem 0 2rem;">
+    <div class="hero-tag">ML Model</div>
+    <h1>Delivery <span>Predictor</span></h1>
+    <p>Enter shipment details to predict whether your order will arrive on time or late.</p>
+  </div>
+
+  <div class="predict-layout">
+
+    <!-- Form -->
+    <div class="form-card">
+      <div class="form-title">Shipment Details</div>
+      <div class="form-sub">Fill in all fields for accurate prediction</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Warehouse Block</label>
+          <select id="f-warehouse">
+            <option value="A">Block A</option>
+            <option value="B">Block B</option>
+            <option value="C">Block C</option>
+            <option value="D">Block D</option>
+            <option value="F">Block F</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mode of Shipment</label>
+          <select id="f-shipment">
+            <option value="Ship">Ship</option>
+            <option value="Flight">Flight</option>
+            <option value="Road">Road</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Customer Care Calls</label>
+          <input type="number" id="f-calls" min="1" max="7" value="3" placeholder="1-7"/>
+        </div>
+        <div class="form-group">
+          <label>Customer Rating</label>
+          <select id="f-rating">
+            <option value="1">1 — Very Poor</option>
+            <option value="2">2 — Poor</option>
+            <option value="3" selected>3 — Average</option>
+            <option value="4">4 — Good</option>
+            <option value="5">5 — Excellent</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Product Cost (USD)</label>
+          <input type="number" id="f-cost" min="96" max="308" value="200" placeholder="96-308"/>
+        </div>
+        <div class="form-group">
+          <label>Prior Purchases</label>
+          <input type="number" id="f-prior" min="2" max="7" value="3" placeholder="2-7"/>
+        </div>
+        <div class="form-group">
+          <label>Product Importance</label>
+          <select id="f-importance">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="f-gender">
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Discount Offered (%)</label>
+          <input type="number" id="f-discount" min="0" max="65" value="10" placeholder="0-65"/>
+        </div>
+        <div class="form-group">
+          <label>Weight (grams)</label>
+          <input type="number" id="f-weight" min="1000" max="7050" value="3500" placeholder="1000-7050"/>
+        </div>
+      </div>
+
+      <button class="predict-btn" onclick="predict()">
+        ⚡ Predict Delivery Status
+      </button>
+    </div>
+
+    <!-- Result -->
+    <div class="result-card">
+      <div id="result-empty" class="result-empty">
+        <div class="result-empty-icon">📊</div>
+        <div class="result-empty-text">Fill in the form and click predict<br/>to see the delivery forecast</div>
+      </div>
+
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <div style="color:var(--muted);font-size:.875rem">Analysing shipment...</div>
+      </div>
+
+      <div id="result-content" style="display:none">
+        <div class="result-header">
+          <div id="result-badge" class="result-badge">—</div>
+          <div class="result-confidence">Confidence: <strong id="result-conf">—</strong></div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-label">Probability Breakdown</div>
+          <div class="prob-bars">
+            <div class="prob-item">
+              <span class="prob-item-label" style="color:var(--success)">On Time</span>
+              <div class="prob-track">
+                <div class="prob-fill" id="prob-ontime" style="background:linear-gradient(90deg,var(--success),#34d399);width:0%"></div>
+              </div>
+              <span class="prob-pct" id="prob-ontime-pct" style="color:var(--success)">—</span>
+            </div>
+            <div class="prob-item">
+              <span class="prob-item-label" style="color:var(--danger)">Late</span>
+              <div class="prob-track">
+                <div class="prob-fill" id="prob-late" style="background:linear-gradient(90deg,var(--danger),#f87171);width:0%"></div>
+              </div>
+              <span class="prob-pct" id="prob-late-pct" style="color:var(--danger)">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="risk-section">
+          <div class="risk-title">Risk Factors</div>
+          <div class="risk-list" id="risk-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ ABOUT PAGE ══════════════ -->
+<div id="page-about" class="page">
+<div class="container">
+
+  <div class="hero" style="padding:2.5rem 0 2rem;">
+    <div class="hero-tag">Project Info</div>
+    <h1>About <span>ShipIQ</span></h1>
+    <p>Portfolio Coursework 2 — Option 2: Real-World Data Analysis & Business Problem Solving</p>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-card">
+      <h3>Business Problem</h3>
+      <p>An international e-commerce electronics company is experiencing a ~60% late delivery rate, causing increased customer complaints, poor ratings, and revenue loss. ShipIQ predicts delivery delays before dispatch so the company can take proactive action.</p>
+    </div>
+    <div class="about-card">
+      <h3>Dataset</h3>
+      <p>E-Commerce Shipping Dataset sourced from Kaggle (by Prachi13). Contains 10,999 real shipment records with 12 features including warehouse block, shipment mode, product details, and delivery outcome.</p>
+    </div>
+    <div class="about-card">
+      <h3>ML Model</h3>
+      <p>Random Forest Classifier trained on 80% of the dataset and tested on 20%. Achieved ~69% accuracy with strong precision and recall scores. Feature importance analysis revealed discount and weight as top predictors.</p>
+    </div>
+    <div class="about-card">
+      <h3>Tech Stack</h3>
+      <p>Built with Python for data analysis and machine learning, Flask for the backend API, and vanilla HTML/CSS/JS for the frontend dashboard.</p>
+      <div class="tech-list">
+        <span class="tech-tag">Python</span>
+        <span class="tech-tag">Flask</span>
+        <span class="tech-tag">Pandas</span>
+        <span class="tech-tag">Scikit-learn</span>
+        <span class="tech-tag">Random Forest</span>
+        <span class="tech-tag">K-Means</span>
+        <span class="tech-tag">Azure</span>
+        <span class="tech-tag">GitHub</span>
+      </div>
+    </div>
+    <div class="about-card">
+      <h3>Project Structure</h3>
+      <p>Well-structured Git repository with separate notebooks for ETL, EDA, Clustering, and Modelling. All outputs, charts, and documentation maintained in organised folders.</p>
+    </div>
+    <div class="about-card">
+      <h3>Cloud Architecture</h3>
+      <p>Azure Blob Storage for raw data, Azure SQL for structured storage, Azure VM for computation. Model deployment via Azure ML REST API endpoint for real-time predictions.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── Navigation ──────────────────────────────────────────────────────────────
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+// ── Load Stats ──────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const res = await fetch('/api/stats');
+    const d = await res.json();
+
+    document.getElementById('s-total').textContent = d.total.toLocaleString();
+    document.getElementById('s-late').textContent = d.late.toLocaleString();
+    document.getElementById('s-late-pct').textContent = d.late_pct + '% of all orders';
+    document.getElementById('s-ontime').textContent = d.on_time.toLocaleString();
+    document.getElementById('s-ontime-pct').textContent = d.ontime_pct + '% of all orders';
+    document.getElementById('s-discount').textContent = d.avg_discount_late + '%';
+
+    // Donut
+    const circ = 2 * Math.PI * 52;
+    const latePct = d.late_pct / 100;
+    const lateArc = circ * latePct;
+    const ontimeArc = circ * (1 - latePct);
+    setTimeout(() => {
+      document.getElementById('donut-late').style.strokeDasharray = lateArc + ' ' + (circ - lateArc);
+      document.getElementById('donut-ontime').style.strokeDasharray = ontimeArc + ' ' + circ;
+      document.getElementById('donut-ontime').style.strokeDashoffset = -(lateArc);
+    }, 300);
+    document.getElementById('donut-pct').textContent = d.late_pct + '%';
+    document.getElementById('leg-late').textContent = d.late_pct + '%';
+    document.getElementById('leg-ontime').textContent = d.ontime_pct + '%';
+
+    // Mode bars
+    const modeEl = document.getElementById('mode-bars');
+    modeEl.innerHTML = '';
+    const colors = ['danger', 'warning', 'accent'];
+    d.by_mode.forEach((m, i) => {
+      modeEl.innerHTML += `
+        <div class="bar-item">
+          <div class="bar-label">${m.mode} <span>${m.pct}% late (${m.total} orders)</span></div>
+          <div class="bar-track"><div class="bar-fill ${colors[i%3]}" style="width:0%" data-w="${m.pct}"></div></div>
+        </div>`;
+    });
+
+    // Warehouse bars
+    const whEl = document.getElementById('wh-bars');
+    whEl.innerHTML = '';
+    d.by_warehouse.forEach((w, i) => {
+      whEl.innerHTML += `
+        <div class="bar-item">
+          <div class="bar-label">Block ${w.block} <span>${w.pct}% late</span></div>
+          <div class="bar-track"><div class="bar-fill ${colors[i%3]}" style="width:0%" data-w="${w.pct}"></div></div>
+        </div>`;
+    });
+
+    // Factor comparison
+    const maxDiscount = Math.max(d.avg_discount_late, d.avg_discount_ontime);
+    const maxWeight = Math.max(d.avg_weight_late, d.avg_weight_ontime);
+    document.getElementById('factor-bars').innerHTML = `
+      <div class="bar-item">
+        <div class="bar-label">Avg Discount — Late <span>${d.avg_discount_late}%</span></div>
+        <div class="bar-track"><div class="bar-fill danger" style="width:0%" data-w="${d.avg_discount_late/maxDiscount*100}"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label">Avg Discount — On Time <span>${d.avg_discount_ontime}%</span></div>
+        <div class="bar-track"><div class="bar-fill success" style="width:0%" data-w="${d.avg_discount_ontime/maxDiscount*100}"></div></div>
+      </div>
+      <div class="bar-item" style="margin-top:.5rem">
+        <div class="bar-label">Avg Weight — Late <span>${d.avg_weight_late.toLocaleString()}g</span></div>
+        <div class="bar-track"><div class="bar-fill danger" style="width:0%" data-w="${d.avg_weight_late/maxWeight*100}"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label">Avg Weight — On Time <span>${d.avg_weight_ontime.toLocaleString()}g</span></div>
+        <div class="bar-track"><div class="bar-fill success" style="width:0%" data-w="${d.avg_weight_ontime/maxWeight*100}"></div></div>
+      </div>`;
+
+    // Animate bars
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill[data-w]').forEach(b => {
+        b.style.width = b.dataset.w + '%';
+      });
+    }, 400);
+
+  } catch(e) {
+    console.error('Stats load failed:', e);
+  }
+}
+
+// ── Predict ─────────────────────────────────────────────────────────────────
+async function predict() {
+  document.getElementById('result-empty').style.display = 'none';
+  document.getElementById('result-content').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+
+  const payload = {
+    warehouse_block     : document.getElementById('f-warehouse').value,
+    mode_of_shipment    : document.getElementById('f-shipment').value,
+    customer_care_calls : document.getElementById('f-calls').value,
+    customer_rating     : document.getElementById('f-rating').value,
+    cost                : document.getElementById('f-cost').value,
+    prior_purchases     : document.getElementById('f-prior').value,
+    product_importance  : document.getElementById('f-importance').value,
+    gender              : document.getElementById('f-gender').value,
+    discount            : document.getElementById('f-discount').value,
+    weight              : document.getElementById('f-weight').value,
+  };
+
+  try {
+    const res = await fetch('/predict', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('result-content').style.display = 'block';
+
+    const badge = document.getElementById('result-badge');
+    badge.textContent = (data.prediction === 1 ? '🚨 ' : '✅ ') + data.label;
+    badge.className = 'result-badge ' + (data.prediction === 1 ? 'late' : 'ontime');
+
+    document.getElementById('result-conf').textContent = data.confidence + '%';
+
+    setTimeout(() => {
+      document.getElementById('prob-ontime').style.width = data.ontime_prob + '%';
+      document.getElementById('prob-late').style.width = data.late_prob + '%';
+    }, 100);
+    document.getElementById('prob-ontime-pct').textContent = data.ontime_prob + '%';
+    document.getElementById('prob-late-pct').textContent = data.late_prob + '%';
+
+    const riskEl = document.getElementById('risk-list');
+    if (data.risk_factors.length === 0) {
+      riskEl.innerHTML = '<div class="no-risk">No major risk factors detected</div>';
+    } else {
+      riskEl.innerHTML = data.risk_factors.map(r => `<div class="risk-item">${r}</div>`).join('');
+    }
+
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('result-empty').style.display = 'block';
+    document.getElementById('result-empty').innerHTML = '<div class="result-empty-icon">❌</div><div class="result-empty-text">Connection error.<br/>Make sure the Flask server is running.</div>';
+  }
+}
+
+// Init
+loadStats();
+</script>
+</body>
+</html>
