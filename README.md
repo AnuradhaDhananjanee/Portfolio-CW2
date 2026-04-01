@@ -26,7 +26,7 @@ Portfolio_CW2/
 │   └── *.png                     # All saved charts
 ├── docs/
 │   ├── methodology.md            # Project methodology
-│   └── cloud_setup.md            # Azure cloud setup notes
+│   └── cloud_setup.md            # AWS cloud setup notes
 ├── reports/
 │   └── final_report.md           # Final report
 ├── README.md
@@ -60,11 +60,11 @@ pip install -r requirements.txt
 
 ---
 
-## Cloud Integration (Azure)
-- **Azure Blob Storage** — Raw dataset storage
-- **Azure SQL Database** — Structured data storage
-- **Azure VM** — Computation environment
-- **Azure ML** — Model deployment (optional)
+## Cloud Integration (AWS)
+- **AWS S3** — Raw dataset storage
+- **AWS RDS** — Structured data storage
+- **AWS EC2** — Computation environment
+- **AWS SageMaker** — Model deployment (optional)
 
 ---
 
@@ -82,4 +82,4 @@ pip install -r requirements.txt
 - Scikit-learn (Random Forest, KMeans, Logistic Regression)
 - Jupyter Notebooks
 - GitHub (Version Control)
-- Azure (Cloud Integration)
+- AWS (Cloud Integration)
